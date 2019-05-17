@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import br.com.unisys.domain.Combustivel;
@@ -16,48 +17,58 @@ import br.com.unisys.util.SecurityPreferences;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Float valorAlcool;
-    private Float valorGasolina;
-    private EditText Alcool;
-    private EditText Gasolina;
-    public static final String MyPREFERENCES = "MyPrefs";
-
-    SharedPreferences sharedPreferences;
+    private EditText editPrecoAlcool;
+    private EditText editPrecoGasolina;
+    private TextView textResultado;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Alcool = findViewById(R.id.EtanoEdt);
-        Gasolina = findViewById(R.id.GasolinaEdt);
+        editPrecoAlcool = (EditText) findViewById(R.id.editPrecoAlcool);
+        editPrecoGasolina = (EditText) findViewById(R.id.editPrecoGasolina);
+        textResultado = (TextView) findViewById(R.id.textResultado);
 
-        sharedPreferences = getSharedPreferences(MyPREFERENCES,Context.MODE_PRIVATE);
+    }
+    public void calcularPreco(View view){
 
-        Button calcular = (Button) findViewById(R.id.CalcularBtn);
-        calcular.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        //recuperar valores digitados
+       String precoAlcool = editPrecoAlcool.getText().toString();
+       String precoGasolina = editPrecoGasolina.getText().toString();
 
-                valorAlcool = Float.parseFloat(Alcool.getText().toString());
-                valorGasolina = Float.parseFloat(Gasolina.getText().toString());
+       //Validar os campos digitados
+        Boolean camposValidados = this.validarCampos(precoAlcool, precoGasolina);
+        if(camposValidados){
+            this.calcularMelhorPreco(precoAlcool,precoGasolina);
+        }else{
+            textResultado.setText("Preencha os preços primeiro!");
+        }
 
-                SharedPreferences.Editor editor = sharedPreferences.edit();
+    }
+    public void calcularMelhorPreco(String pAlcool, String pGasolina){
+        //Converter valores string para numeros
+        Double precoAlcool = Double.parseDouble(pAlcool);
+        Double precoGasolina = Double.parseDouble(pGasolina);
 
-                editor.putFloat("VALORALCOOL",valorAlcool);
-                editor.putFloat("VALORGASOLINA",valorGasolina);
+        Double resultado = precoAlcool / precoGasolina;
+        if(resultado>=0.7){
+            textResultado.setText("Melhor utilizar Gasolina!");
+        }else{
+            textResultado.setText("Melhor utilizar Álcool!");
+        }
+    }
 
-                editor.commit();
+    public Boolean validarCampos(String pAlcool, String pGasolina){
 
-                //valorAlcool = Double.parseDouble(findViewById(R.id.EtanoEdt).toString());
-                //valorGasolina = Double.parseDouble(findViewById(R.id.GasolinaEdt).toString());
+        Boolean camposValidados = true;
+        if(pAlcool == null || pAlcool.equals("")){
+            camposValidados = false;
+        }
+        else if(pGasolina ==null || pGasolina.equals("")){
+            camposValidados = false;
+        }
 
-                if(valorAlcool <= valorGasolina * 0.7){
-                    Toast.makeText(MainActivity.this, "Alcool é melhor", Toast.LENGTH_LONG).show();
-                }else{
-                    Toast.makeText(MainActivity.this, "Gasolina é melhor", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
+        return camposValidados;
     }
 }
