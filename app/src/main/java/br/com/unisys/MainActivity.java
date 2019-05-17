@@ -19,16 +19,20 @@ public class MainActivity extends AppCompatActivity {
 
     private EditText editPrecoAlcool;
     private EditText editPrecoGasolina;
-    private TextView textResultado;
+    //private TextView textResultado;
+    public static final String MyPREFERENCES = "MyPrefs";
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        sharedPreferences = getSharedPreferences(MyPREFERENCES,Context.MODE_PRIVATE);
+
         editPrecoAlcool = (EditText) findViewById(R.id.editPrecoAlcool);
         editPrecoGasolina = (EditText) findViewById(R.id.editPrecoGasolina);
-        textResultado = (TextView) findViewById(R.id.textResultado);
+        //textResultado = (TextView) findViewById(R.id.textResultado);
 
     }
     public void calcularPreco(View view){
@@ -42,20 +46,29 @@ public class MainActivity extends AppCompatActivity {
         if(camposValidados){
             this.calcularMelhorPreco(precoAlcool,precoGasolina);
         }else{
-            textResultado.setText("Preencha os preços primeiro!");
+            //textResultado.setText("Preencha os preços primeiro!");
+            Toast.makeText(this, "Preencha os preços primeiro!", Toast.LENGTH_LONG).show();
         }
+        SharedPreferences.Editor editor = sharedPreferences.edit();
 
+        editor.putString("VALORALCOOL",precoAlcool);
+        editor.putString("VALORGASOLINA",precoGasolina);
+
+        editor.commit();
     }
     public void calcularMelhorPreco(String pAlcool, String pGasolina){
+
         //Converter valores string para numeros
         Double precoAlcool = Double.parseDouble(pAlcool);
         Double precoGasolina = Double.parseDouble(pGasolina);
 
         Double resultado = precoAlcool / precoGasolina;
         if(resultado>=0.7){
-            textResultado.setText("Melhor utilizar Gasolina!");
+            //textResultado.setText("Melhor utilizar Gasolina!");
+            Toast.makeText(this, "Melhor utilizar Gasolina!", Toast.LENGTH_LONG).show();
         }else{
-            textResultado.setText("Melhor utilizar Álcool!");
+            //textResultado.setText("Melhor utilizar Álcool!");
+            Toast.makeText(this, "Melhor utilizar Álcool!", Toast.LENGTH_LONG).show();
         }
     }
 
